@@ -1,2 +1,0 @@
-# studia
-projekty na studia
