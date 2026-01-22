@@ -61,7 +61,6 @@ void pokazTop(string poziom) {
     cin.ignore();
     cin.get();
 }
-// python lepszyyyyyyyyyy
 // menu wynikow
 void menuWynikow() {
     while (true) {
@@ -92,7 +91,7 @@ void rozpocznijGre() {
     else if (wybor == '2') { maksLiczba = 100; poziom = "Sredni"; }
     else { maksLiczba = 250; poziom = "Trudny"; }
 
-    cout << "\nChcesz zakład (limit prób)? (t/n): ";
+    cout << "\nChcesz zaklad (limit prob)? (t/n): ";
     char zaklad;
     cin >> zaklad;
 
@@ -156,8 +155,6 @@ int main() {
         cout << "1. Nowa gra\n";
         if (!listaProb.empty())
             cout << "2. TOP 5\n";
-        else
-            cout << "2. TOP 5 (narazie puste)\n";
         cout << "3. Wyjscie\n";
 
         char wybor;
