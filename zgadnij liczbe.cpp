@@ -5,131 +5,148 @@
 using namespace std;
 
 // dane
-vector<string> listaImion;     // imiona graczy
-vector<int> listaProb;         // liczba prob
-vector<string> listaPoziomow;  // poziom trudnosci
+vector<string> nameList;           // imiona graczy
+vector<int> attemptList;           // liczba prob
+vector<string> difficultyList;     // poziom trudnosci
 
 // rng
-int los;
+int randSeed;
 
-int losuj(int min, int max) {
-    los = (los * 67676767676767 + 123456789) % 100;
-    return min + (los % (max - min + 1));
+int randomInt(int min, int max) {
+    randSeed = (randSeed * 67676767676767 + 123456789) % 100;
+    return min + (randSeed % (max - min + 1));
 }
 
 // sortowanie wynikow
-void sortujWyniki() {
-    for (int i = 0; i < listaProb.size(); i++) {
-        for (int j = i + 1; j < listaProb.size(); j++) {
-            if (listaProb[j] < listaProb[i]) {
-                swap(listaProb[i], listaProb[j]);
-                swap(listaImion[i], listaImion[j]);
-                swap(listaPoziomow[i], listaPoziomow[j]);
+void sortResults() {
+    for (int i = 0; i < attemptList.size(); i++) {
+        for (int j = i + 1; j < attemptList.size(); j++) {
+            if (attemptList[j] < attemptList[i]) {
+                swap(attemptList[i], attemptList[j]);
+                swap(nameList[i], nameList[j]);
+                swap(difficultyList[i], difficultyList[j]);
             }
         }
     }
 }
 
 // naglowek
-void naglowek(string tytul) {
+void header(string title) {
     cout << "\n+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n";
     cout << "+-+-+-ZGADNIJ LICZBE: THE GAME+-+-+-+\n";
     cout << "+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n";
     cout << "+-+-+-+-BY SEBASTIAN RYPOLC-+-+-+-+-+\n";
     cout << "+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n";
-    cout << tytul << "\n\n";
+    cout << title << "\n\n";
 }
 
 // top 5
-void pokazTop(string poziom) {
-    naglowek("TOP 5 - " + poziom);
+void showTop(string difficulty) {
+    header("TOP 5 - " + difficulty);
 
-    int pokazane = 0;
-    for (int i = 0; i < listaProb.size(); i++) {
-        if (listaPoziomow[i] == poziom) {
-            cout << pokazane + 1 << ". ";
-            cout << listaImion[i] << "  proby: " << listaProb[i] << endl;
-            pokazane++;
-            if (pokazane == 5) break;
+    int shown = 0;
+    for (int i = 0; i < attemptList.size(); i++) {
+        if (difficultyList[i] == difficulty) {
+            cout << shown + 1 << ". ";
+            cout << nameList[i] << "  proby: " << attemptList[i] << endl;
+            shown++;
+            if (shown == 5) break;
         }
     }
 
-    if (pokazane == 0)
+    if (shown == 0)
         cout << "Brak wynikow dla tego poziomu.\n";
 
     cout << "\nKliknij enter aby wrocic";
     cin.ignore();
     cin.get();
 }
-// menu wynikow
-void menuWynikow() {
-    while (true) {
-        naglowek("Wyniki:");
-        cout << "1. Latwy\n2. Sredni\n3. Trudny\n4. Powrot\n";
-        char wybor;
-        cin >> wybor;
 
-        if (wybor == '1') pokazTop("Latwy");
-        else if (wybor == '2') pokazTop("Sredni");
-        else if (wybor == '3') pokazTop("Trudny");
-        else if (wybor == '4') return;
+// zeby nie bylo nieskonczonej petli po wpisaniu czegos dziwnego do cin'a
+void readInt(int &x) {
+    while (!(cin >> x)) {
+        cin.clear();
+        cin.ignore(10000, '\n');
+    }
+}
+
+void readChar(char &c) {
+    while (!(cin >> c)) {
+        cin.clear();
+        cin.ignore(10000, '\n');
+    }
+}
+
+
+// menu wynikow
+void resultsMenu() {
+    while (true) {
+        header("Wyniki:");
+        cout << "1. Latwy\n2. Sredni\n3. Trudny\n4. Powrot\n";
+        char choice;
+        readChar(choice);
+
+        if (choice == '1') showTop("Latwy");
+        else if (choice == '2') showTop("Sredni");
+        else if (choice == '3') showTop("Trudny");
+        else if (choice == '4') return;
     }
 }
 
 // rozpocznij gre
-void rozpocznijGre() {
-    naglowek("Wybierz poziom:");
+void startGame() {
+    header("Wybierz poziom:");
     cout << "1. Latwy (1-50)\n2. Sredni (1-100)\n3. Trudny (1-250)\n";
 
-    char wybor;
-    cin >> wybor;
+    char choice;
+    readChar(choice);
 
-    int maksLiczba;
-    string poziom;
+    int maxNumber;
+    string difficulty;
 
-    if (wybor == '1') { maksLiczba = 50; poziom = "Latwy"; }
-    else if (wybor == '2') { maksLiczba = 100; poziom = "Sredni"; }
-    else { maksLiczba = 250; poziom = "Trudny"; }
+    if (choice == '1') { maxNumber = 50; difficulty = "Latwy"; }
+    else if (choice == '2') { maxNumber = 100; difficulty = "Sredni"; }
+    else { maxNumber = 250; difficulty = "Trudny"; }
 
     cout << "\nChcesz zaklad (limit prob)? (t/n): ";
-    char zaklad;
-    cin >> zaklad;
+    char bet;
+    readChar(bet);
 
     int limit = -1;
-    if (zaklad == 't' || zaklad == 'T') {
+    if (bet == 't' || bet == 'T') {
         cout << "Podaj maksymalna liczbe prob: ";
-        cin >> limit;
+        readInt(limit);
     }
 
-    int tajna = losuj(1, maksLiczba);
+    int secretNumber = randomInt(1, maxNumber);
 
-    string male[3] = {"Za malo", "Sprobuj wiecej!", "Jeszcze wyzej"};
-    string duze[3] = {"Za duzo", "Sprobuj mniej", "Za wysoko"};
+    string tooLow[3] = {"Za malo", "Sprobuj wiecej!", "Jeszcze wyzej"};
+    string tooHigh[3] = {"Za duzo", "Sprobuj mniej", "Za wysoko"};
 
-    int proba = 0;
-    int strzal;
+    int attempt = 0;
+    int guess;
 
     while (true) {
-        proba++;
-        cout << "\nProba numer " << proba << ". Podaj liczbe: ";
-        cin >> strzal;
+        attempt++;
+        cout << "\nProba numer " << attempt << ". Podaj liczbe: ";
+        readInt(guess);
 
-        if (strzal < tajna) {
-            cout << male[losuj(0, 2)] << endl;
-        } else if (strzal > tajna) {
-            cout << duze[losuj(0, 2)] << endl;
+        if (guess < secretNumber) {
+            cout << tooLow[randomInt(0, 2)] << endl;
+        } else if (guess > secretNumber) {
+            cout << tooHigh[randomInt(0, 2)] << endl;
         } else {
-            cout << "\nGRATULACJE!!!!!!!!!!!!!! Odgadles liczbe :DDDDD\n";
+            cout << "\nGRATULACJE! Odgadles liczbe!\n";
             cout << "Podaj swoje imie: ";
-            string imie;
-            cin >> imie;
+            string name;
+            cin >> name;
 
             // dodanie wyniku do list
-            listaImion.push_back(imie);
-            listaProb.push_back(proba);
-            listaPoziomow.push_back(poziom);
+            nameList.push_back(name);
+            attemptList.push_back(attempt);
+            difficultyList.push_back(difficulty);
 
-            sortujWyniki();
+            sortResults();
 
             cout << "\nWynik zapisany. Nacisnij enter aby wrocic";
             cin.ignore();
@@ -137,9 +154,9 @@ void rozpocznijGre() {
             return;
         }
 
-        if (limit != -1 && proba >= limit) {
+        if (limit != -1 && attempt >= limit) {
             cout << "\nPrzegrales! Limit prob zostal przekroczony.\n";
-            cout << "Szukana liczba: " << tajna << endl;
+            cout << "Szukana liczba: " << secretNumber << endl;
             cout << "Nacisnij enter aby wrocic";
             cin.ignore();
             cin.get();
@@ -151,18 +168,18 @@ void rozpocznijGre() {
 // menu glowne
 int main() {
     while (true) {
-        naglowek("MENU GLOWNE");
+        header("MENU GLOWNE");
         cout << "1. Nowa gra\n";
-        if (!listaProb.empty())
+        if (!attemptList.empty())
             cout << "2. TOP 5\n";
         cout << "3. Wyjscie\n";
 
-        char wybor;
-        cin >> wybor;
+        char choice;
+        readChar(choice);
 
-        if (wybor == '1') rozpocznijGre();
-        else if (wybor == '2' && !listaProb.empty()) menuWynikow();
-        else if (wybor == '3') break;
+        if (choice == '1') startGame();
+        else if (choice == '2' && !attemptList.empty()) resultsMenu();
+        else if (choice == '3') break;
     }
     return 0;
 }
